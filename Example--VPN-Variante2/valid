@@ -1,0 +1,37 @@
+#!/bin/bash
+# Autor: Stephan Baerwolf, Andy Schleising
+#
+SECRETDIR="/tmp/secrets" #<your/pfad secret datei>
+TOPTSOFT="/tmp/totp"	#<your/pfad/totp programm>
+
+readarray -t lines < $1
+
+username=${lines[0]}
+password=${lines[1]}
+
+
+echo "username ="  $username
+echo "password ="  $password
+
+SECFILE="${SECRETDIR}/${username}.secret"
+
+echo "Bevor 1 IF: "
+echo "SECFILE: " "${SECFILE}"
+
+if [ -e "${SECFILE}" ]; then
+#	read secret into varibale
+#	calculate current topt
+#	check it...
+	secret="$(cat ${SECFILE})"
+	totpval="$(${TOPTSOFT} ${secret})"
+
+	echo  "totpval:§" "${totpval}"
+
+	if [ "${totpval}x" == "totp: ${password}x" ]; then
+		exit 0
+	fi
+	exit 1
+else
+# 	user is not known - reject it
+	exit 1
+fi
